@@ -1,10 +1,10 @@
 import { create } from "zustand";
-import axiosNew from "../components/AxiosConfig";
+import axiosNew from "../components/axios_config";
 
-export const usePelajaran = create((set, get) => ({
-  pelajaran: [],
+export const useKelas = create((set) => ({
+  kelas: [],
   isLoading: false,
-  getPelajaran: async () => {
+  getDataKelas: async () => {
     set({ isLoading: true });
     await axiosNew
       .get("/kelas", {
@@ -13,13 +13,8 @@ export const usePelajaran = create((set, get) => ({
         },
       })
       .then((res) => {
-        // console.log(res.data.data)
-        set({ pelajaran: res.data.data });
+        set({ kelas: res.data.data });
         set({ isLoading: false });
       });
   },
-}));
-
-export const useGetMapel = create((set) => ({
-    
 }));

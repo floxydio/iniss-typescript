@@ -1,10 +1,18 @@
 import { create } from "zustand";
-import axiosNew from "../../components/AxiosConfig";
 import { toast } from "react-toastify";
+import axiosNew from "../../components/axios_config";
 
-export const useAdminMapel = create((set, get) => ({
+export const useAdminMapel = create((set, get: any) => ({
+
   mapel: [],
   addModalTrigger: false,
+
+  openAddModal: async () => {
+    set({ addModalTrigger: true });
+  },
+  closeAddModal: async () => {
+    set({ addModalTrigger: false });
+  },
 
   getMapel: async () => {
     set({ mapel: [] });
@@ -14,7 +22,14 @@ export const useAdminMapel = create((set, get) => ({
       }
     });
   },
-  submitMapel: async (nama_pelajaran, guruId, kelasId, jadwalId, jam) => {
+
+  submitMapel: async (
+    nama_pelajaran: string,
+    guruId: number,
+    kelasId: number,
+    jadwalId: number,
+    jam: string
+  ) => {
     await axiosNew
       .post(
         "/admin/create-pelajaran",
@@ -35,11 +50,13 @@ export const useAdminMapel = create((set, get) => ({
       )
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
-          window.location.reload();
+          get().getMapel();
+          get().closeAddModal();
         }
       })
       .catch((err) => {
         toast.error(err.response.data.message ?? "Something Went Wrong");
       });
   },
+
 }));

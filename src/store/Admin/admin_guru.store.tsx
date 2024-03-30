@@ -1,8 +1,9 @@
 import { create } from "zustand";
-import axiosNew from "../../components/AxiosConfig";
 import { toast } from "react-toastify";
+import axiosNew from "../../components/axios_config";
 
-export const useAdminGuru = create((set, get) => ({
+export const useAdminGuru = create((set) => ({
+  
   guru: [],
   isLoading: false,
   addModalTrigger: false,
@@ -54,7 +55,13 @@ export const useAdminGuru = create((set, get) => ({
         }
       });
   },
-  createGuru: async (nama, username, password, user_agent) => {
+
+  createGuru: async (
+    nama: string,
+    username: string,
+    password: string,
+    user_agent: any
+  ) => {
     await axiosNew
       .post(
         "/admin/create-guru",
@@ -80,7 +87,13 @@ export const useAdminGuru = create((set, get) => ({
         toast.error(err.response.data.message ?? "Something Went Wrong");
       });
   },
-  updateGuru: async (id, nama, username, status_user) => {
+
+  updateGuru: async (
+    id: number,
+    nama: string,
+    username: string,
+    status_user: any
+  ) => {
     await axiosNew
       .put(
         `/admin/edit-guru/${id}`,
@@ -105,7 +118,8 @@ export const useAdminGuru = create((set, get) => ({
         toast.error(err.response.data.message ?? "Something Went Wrong");
       });
   },
-  deleteGuru: async (id) => {
+
+  deleteGuru: async (id: number) => {
     await axiosNew
       .delete(`/admin/delete-guru/${id}`, {
         headers: {
@@ -121,4 +135,5 @@ export const useAdminGuru = create((set, get) => ({
         toast.error(err.response.data.message ?? "Something Went Wrong");
       });
   },
+
 }));

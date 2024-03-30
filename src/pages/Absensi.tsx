@@ -1,4 +1,4 @@
-import React, {useEffect,useState,useRef} from "react";
+import React, { useEffect, useState, useRef, CSSProperties } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -6,14 +6,12 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import axios from "axios";
 import BarLoader from "react-spinners/BarLoader.js";
 import { MonthModels } from "../models/Month_models";
 import {
   Button,
   Chip,
   FormControl,
-  IconButton,
   InputAdornment,
   InputLabel,
   MenuItem,
@@ -24,21 +22,20 @@ import "../style/absensi.css";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-import { AccountCircle, Close, Search } from "@mui/icons-material";
-import axiosNew from "../components/AxiosConfig";
-import cryptoJS from "crypto-js";
+import { Search } from "@mui/icons-material";
 import { useAbsen } from "../store/absen.store";
 import { usePelajaran } from "../store/pelajaran.store";
 import { useKelas } from "../store/kelas.store";
 import { useUserList } from "../store/users_list.store";
 import { useGuru } from "../store/guru.store";
+import axiosNew from "../components/axios_config";
 
-const override = (React.CSSProperties = {
+const override : CSSProperties = {
   transform: "translate(-50%, -50%)",
   top: "50%",
   left: "50%",
   position: "absolute",
-});
+};
 
 const style = {
   position: "absolute",
@@ -113,17 +110,17 @@ export default function Absensi() {
   ];
 
   async function handleOpen(
-    id,
-    namaUser,
-    namaGuru,
-    pelajaran,
-    nomorKelas,
-    keterangan,
-    alasan,
-    hari,
-    bulan,
-    tahun,
-    waktu
+    id: any,
+    namaUser: any,
+    namaGuru: any,
+    pelajaran: any,
+    nomorKelas: any,
+    keterangan: any,
+    alasan: any,
+    hari: any,
+    bulan: any,
+    tahun: any,
+    waktu: any,
   ) {
     setEditId(id);
     setEditNamaUser(namaUser);
@@ -141,14 +138,13 @@ export default function Absensi() {
     async function getGuru() {
       setLoading(true);
       await axiosNew.get("/guru").then(function (res) {
-        setDataValueGuru(res.data.data.find((item) => item.nama === namaGuru));
-        setNamaGuru(res.data.data.find((item) => item.nama === namaGuru));
+        setDataValueGuru(res.data.data.find((item: any) => item.nama === namaGuru));
+        setNamaGuru(res.data.data.find((item: any) => item.nama === namaGuru));
         setDataGuru(res.data.data);
         setLoading(false);
       });
     }
     async function getPelajaran() {
-    
       setLoading(true);
       await axiosNew
         .get("/find-pelajaran", {
@@ -158,10 +154,10 @@ export default function Absensi() {
         })
         .then(function (res) {
           setDataValuePelajaran(
-            res.data.data.find((item) => item.nama === pelajaran)
+            res.data.data.find((item: any) => item.nama === pelajaran)
           );
           setEditPelajaran(
-            res.data.data.find((item) => item.nama === pelajaran)
+            res.data.data.find((item: any) => item.nama === pelajaran)
           );
           setDataPelajaran(res.data.data);
           setLoading(false);
@@ -172,10 +168,10 @@ export default function Absensi() {
 
       await axiosNew.get("/kelas").then(function (res) {
         setDataValueKelas(
-          res.data.data.find((item) => item.nomor === nomorKelas)
+          res.data.data.find((item: any) => item.nomor === nomorKelas)
         );
         setEditNomorkelas(
-          res.data.data.find((item) => item.nomor === nomorKelas)
+          res.data.data.find((item: any) => item.nomor === nomorKelas)
         );
         setDataKelas(res.data.data);
         setLoading(false);
@@ -188,6 +184,30 @@ export default function Absensi() {
 
   async function handleOpenAbsenManual() {
     setOpenManual(true);
+  }
+
+  interface AbsenForm {
+    guruId: number;
+    pelajaranId: number;
+    kelasId: number;
+    userId: number;
+    keterangan: string;
+    reason: string;
+    day: number;
+    month: number;
+    year: number;
+    time: string;
+    type: string;
+  }
+
+  interface AbsenStore {
+    absen: any[];
+    isLoading: boolean;
+    removeAbsen: () => Promise<void>;
+    getAbsen: () => Promise<void>;
+    getAbsenFilterOrderBy: (params: any) => Promise<void>;
+    createAbsen: (form: AbsenForm) => Promise<void>;
+    editAbsen: (form: AbsenForm, id: number) => Promise<void>;
   }
 
   async function filterData() {
@@ -240,7 +260,7 @@ export default function Absensi() {
         orderby: orderBy,
       };
     }
-    useAbsen.getState().getAbsenFilterOrderBy(params);
+    (useAbsen.getState().getAbsenFilterOrderBy(params) as AbsenStore);
   }
 
   async function submitEdit() {
@@ -278,9 +298,8 @@ export default function Absensi() {
         time: editWaktu,
       };
     }
-    await useAbsen.getState().editAbsen(formData,editId)
+    await useAbsen.getState().editAbsen(formData, editId);
   }
-
 
   const handleChangeThrottle = async () => {
     if (!isThrottled) {
@@ -293,11 +312,11 @@ export default function Absensi() {
   };
 
   useEffect(() => {
-    useAbsen.getState().getAbsen()
-    useGuru.getState().getDataGuru()
-    usePelajaran.getState().getPelajaran()
-    useKelas.getState().getDataKelas()
-    useUserList.getState().getUsers()
+    useAbsen.getState().getAbsen();
+    useGuru.getState().getDataGuru();
+    usePelajaran.getState().getPelajaran();
+    useKelas.getState().getDataKelas();
+    useUserList.getState().getUsers();
     setGetMonth(new Date().getMonth() + 1);
   }, [openManual]);
 
@@ -393,39 +412,94 @@ export default function Absensi() {
             <TableHead>
               <TableRow>
                 <TableCell>No</TableCell>
-                <TableCell align="left" style={{
-                fontWeight: "bold"
-              }}>Nama User</TableCell>
-                <TableCell align="left" style={{
-                fontWeight: "bold"
-              }}>Nama Guru</TableCell>
-                <TableCell align="left"style={{
-                fontWeight: "bold"
-              }}>Pelajaran</TableCell>
-                <TableCell align="left"style={{
-                fontWeight: "bold"
-              }}>Nomor Kelas</TableCell>
-                <TableCell align="left"style={{
-                fontWeight: "bold"
-              }}>Keterangan</TableCell>
-                <TableCell align="left"style={{
-                fontWeight: "bold"
-              }}>Alasan</TableCell>
-                <TableCell align="left"style={{
-                fontWeight: "bold"
-              }}>Hari</TableCell>
-                <TableCell align="left"style={{
-                fontWeight: "bold"
-              }}>Bulan</TableCell>
-                <TableCell align="left"style={{
-                fontWeight: "bold"
-              }}>Tahun</TableCell>
-                <TableCell align="left"style={{
-                fontWeight: "bold"
-              }}>Waktu</TableCell>
-                <TableCell align="left"style={{
-                fontWeight: "bold"
-              }}>Action</TableCell>
+                <TableCell
+                  align="left"
+                  style={{
+                    fontWeight: "bold",
+                  }}
+                >
+                  Nama User
+                </TableCell>
+                <TableCell
+                  align="left"
+                  style={{
+                    fontWeight: "bold",
+                  }}
+                >
+                  Nama Guru
+                </TableCell>
+                <TableCell
+                  align="left"
+                  style={{
+                    fontWeight: "bold",
+                  }}
+                >
+                  Pelajaran
+                </TableCell>
+                <TableCell
+                  align="left"
+                  style={{
+                    fontWeight: "bold",
+                  }}
+                >
+                  Nomor Kelas
+                </TableCell>
+                <TableCell
+                  align="left"
+                  style={{
+                    fontWeight: "bold",
+                  }}
+                >
+                  Keterangan
+                </TableCell>
+                <TableCell
+                  align="left"
+                  style={{
+                    fontWeight: "bold",
+                  }}
+                >
+                  Alasan
+                </TableCell>
+                <TableCell
+                  align="left"
+                  style={{
+                    fontWeight: "bold",
+                  }}
+                >
+                  Hari
+                </TableCell>
+                <TableCell
+                  align="left"
+                  style={{
+                    fontWeight: "bold",
+                  }}
+                >
+                  Bulan
+                </TableCell>
+                <TableCell
+                  align="left"
+                  style={{
+                    fontWeight: "bold",
+                  }}
+                >
+                  Tahun
+                </TableCell>
+                <TableCell
+                  align="left"
+                  style={{
+                    fontWeight: "bold",
+                  }}
+                >
+                  Waktu
+                </TableCell>
+                <TableCell
+                  align="left"
+                  style={{
+                    fontWeight: "bold",
+                  }}
+                >
+                  Action
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -437,7 +511,7 @@ export default function Absensi() {
                   <TableCell component="th" scope="row">
                     {i + 1}
                   </TableCell>
-                  <TableCell align="left" >{row.nama_user}</TableCell>
+                  <TableCell align="left">{row.nama_user}</TableCell>
                   <TableCell align="left">{row.nama_guru}</TableCell>
                   <TableCell align="left">{row.pelajaran_nama}</TableCell>
                   <TableCell align="left">{row.nomor_kelas}</TableCell>
@@ -827,7 +901,23 @@ export default function Absensi() {
                       style={{
                         marginTop: 30,
                       }}
-                      onClick={() => useAbsen.getState().createAbsen(addNamaGuru,addPelajaran,addNomorKelas,addUser,addKeterangan,addAlasan,addHari,addBulan,addTahun,addWaktu,editKeterangan)}
+                      onClick={() =>
+                        useAbsen
+                          .getState()
+                          .createAbsen(
+                            addNamaGuru,
+                            addPelajaran,
+                            addNomorKelas,
+                            addUser,
+                            addKeterangan,
+                            addAlasan,
+                            addHari,
+                            addBulan,
+                            addTahun,
+                            addWaktu,
+                            editKeterangan
+                          )
+                      }
                       variant="contained"
                     >
                       Submit

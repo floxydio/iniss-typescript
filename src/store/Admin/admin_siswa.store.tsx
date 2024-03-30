@@ -1,20 +1,20 @@
 import { create } from "zustand";
-import axiosNew from "../../components/AxiosConfig";
+import axiosNew from "../../components/axios_config";
 import { toast } from "react-toastify";
 
-export const useKelasAdmin = create((set, get) => ({
-
+export const useAdminSiswa = create((set, get: any) => ({
+  siswa: [],
   kelas: [],
-  guru: [],
-  isLoading: false,
+  totalPageSiswa: 0,
+  totalPageKelas: 0,
   addModalTrigger: false,
   editModalTrigger: false,
   deleteModalTrigger: false,
 
-  openAddModal: async () => {
+  onOpenModal: async () => {
     set({ addModalTrigger: true });
   },
-  closeAddModal: async () => {
+  onCloseModal: async () => {
     set({ addModalTrigger: false });
   },
 
@@ -32,58 +32,66 @@ export const useKelasAdmin = create((set, get) => ({
     set({ deleteModalTrigger: false });
   },
 
-  getDataKelas: async () => {
-    set({ isLoading: true });
+  fetchKelas: async () => {
     set({ kelas: [] });
     await axiosNew
-      .get(`/kelas`, {
+      .get("/kelas", {
         headers: {
           "x-access-token": localStorage.getItem("token"),
         },
       })
       .then((res) => {
         if (res.status === 200) {
-          set({ isLoading: false });
+          console.log(res.data);
+          set({ totalPageKelas: res.data.total_page });
           set({ kelas: res.data.data });
         }
       });
   },
 
-  getGuruForAdmin: async () => {
+  fetchSiswa: async (page: any) => {
+    set({ siswa: [] });
     await axiosNew
-      .get("/list-user-guru", {
+      .get(`/admin/find-siswa?page=${page}`, {
         headers: {
           "x-access-token": localStorage.getItem("token"),
         },
       })
       .then((res) => {
         if (res.status === 200) {
-          set({ guru: res.data.data });
+          set({ totalPageSiswa: res.data.total_page });
+
+          set({ siswa: res.data.data });
         }
       });
   },
 
-  submitKelas: async (guru_id, nomor_kelas, jumlah_orang) => {
-    set({ isLoading: true });
+  sendCreateSiswa: async (
+    nama: string,
+    username: string,
+    password: string,
+    kelas: number
+  ) => {
     await axiosNew
       .post(
-        "/admin/create-kelas",
+        "/admin/create-siswa",
         {
-          guru_id: guru_id,
-          nomor_kelas: nomor_kelas,
-          jumlah_orang: jumlah_orang,
+          nama: nama,
+          username: username,
+          password: password,
+          kelas_id: Number(kelas),
         },
         {
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
             "x-access-token": localStorage.getItem("token"),
+            "Content-Type": "application/x-www-form-urlencoded",
           },
         }
       )
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
-          get().getDataKelas();
-          get().closeAddModal();
+          get().fetchSiswa();
+          get().onCloseModal();
         }
       })
       .catch((err) => {
@@ -91,26 +99,33 @@ export const useKelasAdmin = create((set, get) => ({
       });
   },
 
-  editKelas: async (id, guru_id, nomor_kelas, jumlah_orang) => {
-    set({ isLoading: true });
+  editSiswa: async (
+    id: number,
+    nama: string,
+    username: string,
+    password: string,
+    kelas: number
+  ) => {
     await axiosNew
       .put(
-        `/admin/edit-kelas/${id}`,
+        `/admin/edit-siswa/${id}`,
         {
-          guru_id: guru_id,
-          nomor_kelas: nomor_kelas,
-          jumlah_orang: Number(jumlah_orang),
+          nama: nama,
+          username: username,
+          password: password,
+          status_user: 1,
+          kelas_id: Number(kelas),
         },
         {
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
             "x-access-token": localStorage.getItem("token"),
+            "Content-Type": "application/x-www-form-urlencoded",
           },
         }
       )
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
-          get().getDataKelas();
+          get().fetchSiswa();
           get().closeEditModal();
         }
       })
@@ -119,16 +134,16 @@ export const useKelasAdmin = create((set, get) => ({
       });
   },
 
-  deleteKelas: async (id) => {
+  deleteSiswa: async (id: number) => {
     await axiosNew
-      .delete(`/admin/delete-kelas/${id}`, {
+      .delete(`/admin/delete-siswa/${id}`, {
         headers: {
           "x-access-token": localStorage.getItem("token"),
         },
       })
       .then((res) => {
-        if (res.status === 200) {
-          get().getDataKelas();
+        if (res.status === 200 || res.status === 201) {
+          get().fetchSiswa();
           get().closeDeleteModal();
         }
       })
