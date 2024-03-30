@@ -2,7 +2,20 @@ import { create } from "zustand";
 import axiosNew from "../../components/axios_config";
 import { toast } from "react-toastify";
 
+export interface Siswa {
+  siswa_id: number,
+  nama: string,
+  username: string,
+  password: string,
+  status_user: number,
+  user_agent: string,
+  profile_pic: string,
+  no_telp: string,
+  kelas_id: number,
+}
+
 export const useAdminSiswa = create((set, get: any) => ({
+
   siswa: [],
   kelas: [],
   totalPageSiswa: 0,
